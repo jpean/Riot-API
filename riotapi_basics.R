@@ -5,17 +5,27 @@ library(dplyr)
 # Constants
 main_url <- ".api.riotgames.com/lol"
 
-summoner_url<-"summoner/v4/summoners/by-name" #specific section just for my uses, can be edited to use other inputs
-  
-match_url<-"match/v4/matches" 
+summoner_url<-"summoner/v4/summoners" 
 
-matchlist_url<-"match/v4/matchlists/by-account" 
+champion_url<-"platform/v3/champion-rotations"
+
+status_url <- "status/v3/shard-data"
+
+match_url<-"match/v4"
 
 mastery_url <- "champion-mastery/v4/champion-masteries/by-summoner"
 
+score_url <- "champion-mastery/v4/scores/by-summoner"
+
+league_url<- "league/v4"
+
+spectator_url <- "spectator/v4"
+
 regions <-c("br1", "eun1", "euw1", "kr", "la1", "la2", "na1", "oce1", "ru", "tr1")
 
-request_type<-c("summoner"=summoner_url,"match"=match_url,"matchlist"=matchlist_url,"mastery"=mastery_url)
+request_type<-c("summoner"=summoner_url,"champion"=champion_url,"match"=match_url,
+                "matchlist"=matchlist_url,"mastery"=mastery_url, "status"=status_url,
+                "score"=score_url,"league"=league_url,"spectator"=spectator_url)
 
 # Base functions
 
@@ -32,7 +42,10 @@ add_api_key <- function(str, api_key){
   paste0(str, "?api_key=", api_key)
 }
 
-api_fetch <- function(api_type, api_value = NULL,..., region = Sys.getenv("LOLAPI_REGION"), api_key = Sys.getenv("LOLAPI_KEY"), api_function = create_url) {
+api_fetch <- function(api_type, api_value = NULL,...,
+                      region = Sys.getenv("LOLAPI_REGION"), 
+                      api_key = Sys.getenv("LOLAPI_KEY"), 
+                      api_function = create_url) {
   res <- api_function(region, api_type, api_value) %>% 
     add_api_key(api_key)
   safeJSON <- purrr::safely(function(x) jsonlite::fromJSON(x, simplifyVector =  FALSE))
